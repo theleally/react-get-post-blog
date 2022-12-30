@@ -1,11 +1,11 @@
 import { useState, useEffect, EventHandler, ChangeEvent } from "react";
 import { Post } from "./types/Post";
+import { PostForm } from "./components/PostForm";
+import { PostItem } from "./components/PostItem";
 
 const App = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
-  const [addTitleText, setAddTitleText] = useState("");
-  const [addBodyText, setAddBodyText] = useState("");
 
   useEffect(() => {
     loadPosts();
@@ -35,15 +35,7 @@ const App = () => {
     setLoading(false);
     setPosts(json);
   };
-
-  const handleAddTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setAddTitleText(e.target.value);
-  };
-
-  const handleAddBodyChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setAddBodyText(e.target.value);
-  };
-
+  /*
   const handleAddClick = async () => {
     if (addTitleText && addBodyText) {
       let response = await fetch("https://jsonplaceholder.typicode.com/posts", {
@@ -67,40 +59,34 @@ const App = () => {
       alert("Preencha todos os campos");
     }
   };
+  */
+
+  const handleAddPost = async (title: string, body: string) => {
+    let response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      body: JSON.stringify({ title, body, userId: 1 }),
+      headers: { "Content-type": "application/json" },
+    });
+    let json = await response.json();
+    if (json.id) {
+      alert("Post adicionado com sucesso!");
+    } else {
+      alert("Ocorreu algum erro!");
+    }
+  };
 
   return (
     <div className="p-5">
       {loading && <div>Carregando...</div>}
-      <fieldset className="border-2 mb-3 p-3">
-        <legend>Adicionar novo post</legend>
-        <input
-          value={addTitleText}
-          onChange={handleAddTitleChange}
-          className="block border"
-          type="text"
-          placeholder="Digite um título"
-        />
-        <textarea
-          value={addBodyText}
-          onChange={handleAddBodyChange}
-          className="block border"
-        ></textarea>
-        <button className="block border" onClick={handleAddClick}>
-          Adicionar
-        </button>
-      </fieldset>
+
+      <PostForm onAdd={handleAddPost} />
+
       {!loading && posts.length > 0 && (
         <>
           <p>Total de posts: {posts.length}</p>
           <div>
             {posts.map((item, index) => (
-              <div key={index} className="my-4">
-                <h4 className="font-bold">{item.title}</h4>
-                <small>
-                  #{item.id} - Usuário: {item.userId}
-                </small>
-                <p>{item.body}</p>
-              </div>
+              <PostItem data={item} />
             ))}
           </div>
         </>
