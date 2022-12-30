@@ -44,7 +44,29 @@ const App = () => {
     setAddBodyText(e.target.value);
   };
 
-  const handleAddClick = () => {};
+  const handleAddClick = async () => {
+    if (addTitleText && addBodyText) {
+      let response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+        method: "POST",
+        body: JSON.stringify({
+          title: addTitleText,
+          body: addBodyText,
+          userId: 1,
+        }),
+        headers: {
+          "Content-type": "application/json",
+        },
+      });
+      let json = await response.json();
+      if (json.id) {
+        alert("Post adicionado com sucesso!");
+      } else {
+        alert("Ocorreu algum erro!");
+      }
+    } else {
+      alert("Preencha todos os campos");
+    }
+  };
 
   return (
     <div className="p-5">
